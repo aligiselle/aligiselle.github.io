@@ -33,7 +33,7 @@ class App{
 		container.appendChild( this.renderer.domElement );
 		
         //Add code here
-        this.LoadingBar = new LoadingBar();
+        this.loadingBar = new LoadingBar();
         this.loadGLTF();
         
         
