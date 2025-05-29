@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>AR Spinning Cube with Audio</title>
+    <title>AR Spinning Cube (Fixed Version)</title>
     <style>
         body { 
             margin: 0;
@@ -29,19 +29,6 @@
             background-color: #cccccc;
             cursor: default;
         }
-        #audio-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 8px 16px;
-            background-color: #34a853;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            z-index: 100;
-        }
         #info {
             position: absolute;
             top: 20px;
@@ -61,10 +48,8 @@
         Click "Start AR" then tap to place a spinning cube
     </div>
     <button id="ar-button">Start AR</button>
-    <button id="audio-toggle">Toggle Audio</button>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/webxr/ARButton.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/XRControllerModelFactory.js"></script>
     <script>
         // Initialize variables
         let container, scene, camera, renderer;
@@ -73,12 +58,6 @@
         let reticle;
         let hitTestSource = null;
         let hitTestSourceRequested = false;
-        
-        // Audio variables
-        let audioListener;
-        let placementSound;
-        let backgroundSound;
-        let audioEnabled = true;
         
         init();
         animate();
@@ -100,13 +79,15 @@
             renderer.xr.enabled = true;
             container.appendChild(renderer.domElement);
             
-            // Initialize audio
-            initAudio();
-            
             // Add AR button with proper async handling
             document.getElementById('ar-button').addEventListener('click', async () => {
                 try {
-                    const supported = await renderer.xr.isSessionSupported('immersive-ar');
+                    // Check AR support using the proper WebXR API
+                    if (!navigator.xr) {
+                        throw new Error('WebXR not available');
+                    }
+                    
+                    const supported = await navigator.xr.isSessionSupported('immersive-ar');
                     
                     if (supported) {
                         const sessionInit = { 
@@ -114,29 +95,27 @@
                             domOverlay: { root: document.body }
                         };
                         
-                        // Important: Set reference space before starting session
-                        renderer.xr.setReferenceSpaceType('local');
-                        
                         const session = await navigator.xr.requestSession('immersive-ar', sessionInit);
                         renderer.xr.setSession(session);
                         
-                        document.getElementById('ar-button').style.display = 'none';
+                        // Set reference space after session starts
+                        session.updateRenderState({
+                            baseLayer: new XRWebGLLayer(session, renderer.getContext())
+                        });
                         
-                        // Play background music when AR starts
-                        if (audioEnabled) {
-                            backgroundSound.play().catch(e => console.log("Audio play failed:", e));
-                        }
+                        session.requestReferenceSpace('local').then((refSpace) => {
+                            renderer.xr.setReferenceSpace(refSpace);
+                        });
+                        
+                        document.getElementById('ar-button').style.display = 'none';
                     } else {
                         alert('AR is not supported on your device or browser');
                     }
                 } catch (error) {
                     console.error('AR session failed:', error);
-                    alert('Failed to start AR: ' + error.message);
+                    document.getElementById('info').textContent += `\n\nError: ${error.message}`;
                 }
             });
-            
-            // Add audio toggle button
-            document.getElementById('audio-toggle').addEventListener('click', toggleAudio);
             
             // Add light
             const light = new THREE.DirectionalLight(0xffffff, 1);
@@ -165,46 +144,6 @@
             checkARSupport();
         }
         
-        function initAudio() {
-            // Create audio listener (attached to camera)
-            audioListener = new THREE.AudioListener();
-            camera.add(audioListener);
-            
-            // Create placement sound
-            const placementLoader = new THREE.AudioLoader();
-            placementSound = new THREE.Audio(audioListener);
-            placementLoader.load('https://assets.codepen.io/21542/howler-ping.mp3', (buffer) => {
-                placementSound.setBuffer(buffer);
-                placementSound.setVolume(0.5);
-            }, undefined, (error) => {
-                console.error('Error loading placement sound:', error);
-            });
-            
-            // Create background sound (looping)
-            const backgroundLoader = new THREE.AudioLoader();
-            backgroundSound = new THREE.Audio(audioListener);
-            backgroundLoader.load('https://assets.codepen.io/21542/howler-ambient.mp3', (buffer) => {
-                backgroundSound.setBuffer(buffer);
-                backgroundSound.setLoop(true);
-                backgroundSound.setVolume(0.3);
-            }, undefined, (error) => {
-                console.error('Error loading background sound:', error);
-            });
-        }
-        
-        function toggleAudio() {
-            audioEnabled = !audioEnabled;
-            
-            if (audioEnabled) {
-                document.getElementById('audio-toggle').textContent = "Mute Audio";
-                backgroundSound.play().catch(e => console.log("Audio play failed:", e));
-            } else {
-                document.getElementById('audio-toggle').textContent = "Unmute Audio";
-                backgroundSound.pause();
-                placementSound.stop();
-            }
-        }
-        
         async function checkARSupport() {
             if (navigator.xr) {
                 try {
@@ -224,7 +163,7 @@
                 if (!window.isSecureContext) {
                     message += 'WebXR needs HTTPS or localhost.';
                 } else {
-                    message += 'Try a different browser (Chrome for Android recommended).';
+                    message += 'Try Chrome for Android (recommended).';
                 }
                 document.getElementById('info').textContent += "\n\n" + message;
             }
@@ -248,11 +187,6 @@
                 cube = new THREE.Mesh(geometry, material);
                 cube.position.setFromMatrixPosition(reticle.matrix);
                 scene.add(cube);
-                
-                // Play placement sound
-                if (audioEnabled) {
-                    placementSound.play().catch(e => console.log("Audio play failed:", e));
-                }
             }
         }
         
