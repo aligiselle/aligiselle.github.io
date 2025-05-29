@@ -42,9 +42,24 @@
             cursor: pointer;
             z-index: 100;
         }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background-color: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            max-width: 300px;
+        }
     </style>
 </head>
 <body>
+    <div id="info">
+        AR Cube Demo<br>
+        Click "Start AR" then tap to place a spinning cube
+    </div>
     <button id="ar-button">Start AR</button>
     <button id="audio-toggle">Toggle Audio</button>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
@@ -68,7 +83,7 @@
         init();
         animate();
         
-        function init() {
+        async function init() {
             container = document.createElement('div');
             document.body.appendChild(container);
             
@@ -78,7 +93,7 @@
             // Create camera
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
             
-            // Create renderer
+            // Create renderer with correct XR configuration
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -88,29 +103,35 @@
             // Initialize audio
             initAudio();
             
-            // Add AR button
+            // Add AR button with proper async handling
             document.getElementById('ar-button').addEventListener('click', async () => {
                 try {
-                    await renderer.xr.isSessionSupported('immersive-ar').then((supported) => {
-                        if (supported) {
-                            const sessionInit = { 
-                                optionalFeatures: ['hit-test', 'dom-overlay'],
-                                domOverlay: { root: document.body }
-                            };
-                            renderer.xr.setReferenceSpaceType('local');
-                            renderer.xr.startSession('immersive-ar', sessionInit);
-                            document.getElementById('ar-button').style.display = 'none';
-                            
-                            // Play background music when AR starts
-                            if (audioEnabled) {
-                                backgroundSound.play();
-                            }
-                        } else {
-                            alert('AR is not supported on your device');
+                    const supported = await renderer.xr.isSessionSupported('immersive-ar');
+                    
+                    if (supported) {
+                        const sessionInit = { 
+                            optionalFeatures: ['hit-test', 'dom-overlay'],
+                            domOverlay: { root: document.body }
+                        };
+                        
+                        // Important: Set reference space before starting session
+                        renderer.xr.setReferenceSpaceType('local');
+                        
+                        const session = await navigator.xr.requestSession('immersive-ar', sessionInit);
+                        renderer.xr.setSession(session);
+                        
+                        document.getElementById('ar-button').style.display = 'none';
+                        
+                        // Play background music when AR starts
+                        if (audioEnabled) {
+                            backgroundSound.play().catch(e => console.log("Audio play failed:", e));
                         }
-                    });
+                    } else {
+                        alert('AR is not supported on your device or browser');
+                    }
                 } catch (error) {
                     console.error('AR session failed:', error);
+                    alert('Failed to start AR: ' + error.message);
                 }
             });
             
@@ -155,6 +176,8 @@
             placementLoader.load('https://assets.codepen.io/21542/howler-ping.mp3', (buffer) => {
                 placementSound.setBuffer(buffer);
                 placementSound.setVolume(0.5);
+            }, undefined, (error) => {
+                console.error('Error loading placement sound:', error);
             });
             
             // Create background sound (looping)
@@ -164,6 +187,8 @@
                 backgroundSound.setBuffer(buffer);
                 backgroundSound.setLoop(true);
                 backgroundSound.setVolume(0.3);
+            }, undefined, (error) => {
+                console.error('Error loading background sound:', error);
             });
         }
         
@@ -172,7 +197,7 @@
             
             if (audioEnabled) {
                 document.getElementById('audio-toggle').textContent = "Mute Audio";
-                backgroundSound.play();
+                backgroundSound.play().catch(e => console.log("Audio play failed:", e));
             } else {
                 document.getElementById('audio-toggle').textContent = "Unmute Audio";
                 backgroundSound.pause();
@@ -180,18 +205,28 @@
             }
         }
         
-        function checkARSupport() {
+        async function checkARSupport() {
             if (navigator.xr) {
-                navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
+                try {
+                    const supported = await navigator.xr.isSessionSupported('immersive-ar');
                     document.getElementById('ar-button').disabled = !supported;
-                });
+                    if (!supported) {
+                        document.getElementById('info').textContent += "\n\nAR not supported on your device";
+                    }
+                } catch (error) {
+                    console.error('XR support check failed:', error);
+                    document.getElementById('ar-button').disabled = true;
+                    document.getElementById('info').textContent += "\n\nError checking AR support";
+                }
             } else {
                 document.getElementById('ar-button').disabled = true;
-                if (window.isSecureContext) {
-                    alert('WebXR not available. Try a different browser or device.');
+                let message = 'WebXR not available. ';
+                if (!window.isSecureContext) {
+                    message += 'WebXR needs HTTPS or localhost.';
                 } else {
-                    alert('WebXR needs a secure context (HTTPS or localhost)');
+                    message += 'Try a different browser (Chrome for Android recommended).';
                 }
+                document.getElementById('info').textContent += "\n\n" + message;
             }
         }
         
@@ -216,7 +251,7 @@
                 
                 // Play placement sound
                 if (audioEnabled) {
-                    placementSound.play();
+                    placementSound.play().catch(e => console.log("Audio play failed:", e));
                 }
             }
         }
@@ -229,10 +264,13 @@
                     
                     if (session && !hitTestSourceRequested) {
                         session.requestReferenceSpace('viewer').then((referenceSpace) => {
-                            session.requestHitTestSource({ space: referenceSpace }).then((source) => {
-                                hitTestSource = source;
-                            });
+                            return session.requestHitTestSource({ space: referenceSpace });
+                        }).then((source) => {
+                            hitTestSource = source;
+                        }).catch((error) => {
+                            console.error('Hit test failed:', error);
                         });
+                        
                         hitTestSourceRequested = true;
                     }
                     
