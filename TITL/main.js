@@ -12,7 +12,6 @@ camera.lookAt( 0, 0, 0 );
 //RENDERER
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
-renderer.setAnimationLoop( animate );
 document.body.appendChild( renderer.domElement );
 
 //const geometry = new THREE.BoxGeometry( 1, 1, 1 );
