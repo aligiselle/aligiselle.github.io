@@ -1,71 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>WebAR Red Spinning Cube</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { margin: 0; overflow: hidden; }
-    canvas { display: block; }
-  </style>
-</head>
-<body>
-  <script type="module">
-    import * as THREE from 'https://cdn.skypack.dev/three@0.152.2';
-    import { ARButton } from 'https://cdn.skypack.dev/three@0.152.2/examples/jsm/webxr/ARButton.js';
+  <head>
+    <meta charset="UTF-8" />
+    <title>AR Red Spinning Cube</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from 'https://cdn.skypack.dev/three@0.152.2';
+      import { ARButton } from 'https://cdn.skypack.dev/three@0.152.2/examples/jsm/webxr/ARButton.js';
 
-    let camera, scene, renderer;
-    let cube;
+      let camera, scene, renderer;
+      let cube;
 
-    init();
-    animate();
+      init();
+      animate();
 
-    function init() {
-      // Scene setup
-      scene = new THREE.Scene();
+      function init() {
+        scene = new THREE.Scene();
 
-      // Camera
-      camera = new THREE.PerspectiveCamera(
-        70,
-        window.innerWidth / window.innerHeight,
-        0.01,
-        20
-      );
+        camera = new THREE.PerspectiveCamera(
+          70,
+          window.innerWidth / window.innerHeight,
+          0.01,
+          20
+        );
 
-      // Renderer
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.xr.enabled = true;
-      document.body.appendChild(renderer.domElement);
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.xr.enabled = true;
+        renderer.xr.setReferenceSpaceType('local');
+        document.body.appendChild(renderer.domElement);
 
-      // AR Button
-      document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] }));
+        // Add AR Button
+        document.body.appendChild(
+          ARButton.createButton(renderer, {
+            requiredFeatures: ['hit-test'],
+          })
+        );
 
-      // Create red cube
-      const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-      const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-      cube = new THREE.Mesh(geometry, material);
-      cube.position.set(0, 0, -0.5); // Half meter in front of the user
-      scene.add(cube);
+        // When the AR session starts
+        renderer.xr.addEventListener('sessionstart', () => {
+          // Create a red cube and place it 0.5m in front of the camera
+          const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+          const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+          cube = new THREE.Mesh(geometry, material);
 
-      window.addEventListener('resize', onWindowResize, false);
-    }
+          const cam = renderer.xr.getCamera();
+          const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion);
+          const position = new THREE.Vector3().copy(cam.position).add(dir.multiplyScalar(0.5));
 
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
+          cube.position.copy(position);
+          scene.add(cube);
+        });
 
-    function animate() {
-      renderer.setAnimationLoop(render);
-    }
+        window.addEventListener('resize', onWindowResize, false);
+      }
 
-    function render(timestamp, frame) {
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    }
-  </script>
-</body>
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+      function animate() {
+        renderer.setAnimationLoop(render);
+      }
+
+      function render() {
+        if (cube) {
+          cube.rotation.y += 0.01;
+          cube.rotation.x += 0.01;
+        }
+
+        renderer.render(scene, camera);
+      }
+    </script>
+  </body>
 </html>
