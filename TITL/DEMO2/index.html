@@ -25,7 +25,9 @@
                 height="4"
                 position="1 0 2.5"
                 rotation="-90 0 0"
-                src="assets/HappyBirthday2.png">
+                src="assets/HappyBirthday2.png"
+                link="href: https:www.yahoo.com"
+                >
 
             </a-image>
         </a-marker>
@@ -38,7 +40,7 @@
         </a-marker>
 
         <!-- use this <a-entity camera> to support multiple-markers, otherwise use <a-marker-camera> instead of </a-marker> -->
-        <a-entity camera></a-entity>
+        <a-entity camera cursor="fuse: false: rayOrigin: mouse;"></a-entity>
         </a-scene>
     </body>
 </html>
