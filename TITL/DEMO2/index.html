@@ -15,19 +15,27 @@
 
         <a-assets>
             <a-asset-item id="animated-asset" src="https://raw.githubusercontent.com/nicolocarpignoli/nicolocarpignoli.github.io/master/ar-playground/models/CesiumMan.gltf"></a-asset-item>
+            <video id="searching" autoplay loop="true" src="assets/Searching2.mp4"></video>
         </a-assets>
 
         <a-marker type='barcode' value='7'>
+            <a-video
+                 src="#searching"
+                 width="1.8"
+                 height="3.2"
+                 position="0 0 0"
+                 rotation="0 0 0"
+            >
+            </a-video>
             <a-image
                 id="ar-image"
                 width="2"
                 height="2"
-                position="0 0 0"
+                position="0 0 2.5"
                 rotation="-90 0 0"
                 src="assets/HappyBirthday2.png"
                 link="href: https://yahoo.com"
                 >
-
             </a-image>
         </a-marker>
 
