@@ -4,21 +4,21 @@
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <title>Demo1</title>
     <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
-
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     
     </head>
 
     <body style='margin : 0px; overflow: hidden;'>
         <!-- we add detectionMode and matrixCodeType to tell AR.js to recognize barcode markers -->
-        <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;' xr-mode-ui="enabled: false">
+        <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; patternRatio:0.90;' xr-mode-ui="enabled: false">
 
         <a-assets>
             <a-asset-item id="animated-asset" src="https://raw.githubusercontent.com/nicolocarpignoli/nicolocarpignoli.github.io/master/ar-playground/models/CesiumMan.gltf"></a-asset-item>
             <video id="searching" autoplay loop="true" src="assets/Searching2_1.mp4"></video>
         </a-assets>
 
-        <a-marker type='pattern' url='assets\pattern-BHE-Circular.patt'>
+        <a-marker type='pattern' preset='custom' url="assets/pattern-BHE-Circular.patt">
             <a-video
                  src="#searching"
                  width="0.9"
