@@ -51,5 +51,11 @@
         <!-- use this <a-entity camera> to support multiple-markers, otherwise use <a-marker-camera> instead of </a-marker> -->
         <a-entity camera cursor="fuse: false; rayOrigin: mouse;"></a-entity>
         </a-scene>
+        <script>
+          window.addEventListener("click", ()=>{
+            const video = document.getElementById("searching")
+            video.play()
+          })
+        </script>
     </body>
 </html>
