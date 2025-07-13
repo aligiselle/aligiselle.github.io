@@ -11,14 +11,14 @@
 
     <body style='margin : 0px; overflow: hidden;'>
         <!-- we add detectionMode and matrixCodeType to tell AR.js to recognize barcode markers -->
-        <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; patternRatio:0.90;' xr-mode-ui="enabled: false">
+        <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; patternRatio:0.80;' xr-mode-ui="enabled: false">
 
         <a-assets>
             <a-asset-item id="animated-asset" src="https://raw.githubusercontent.com/nicolocarpignoli/nicolocarpignoli.github.io/master/ar-playground/models/CesiumMan.gltf"></a-asset-item>
             <video id="searching" autoplay loop="true" src="assets/Searching2_1.mp4"></video>
         </a-assets>
 
-        <a-marker type="pattern" preset="custom" url="assets/pattern-BHE-Circular.patt">
+        <a-marker type="pattern" preset="custom" url="assets/pattern-frame.patt" emitevents="true">
             <a-video
                  src="#searching"
                  width="0.9"
