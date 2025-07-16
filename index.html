@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TITL LAUNCH</title>
+  <title>TITL RE-LAUNCH</title>
     <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
@@ -20,8 +20,8 @@
 <a-marker type="pattern" preset="custom" url="assets/pattern-frame.patt" emitevents="true">
     <a-video
          src="#searching"
-         width="0.9"
-         height="1.6"
+         width="1.6"
+         height="0.9"
          position="0 0 0"
          rotation="-90 0 0"
     >
@@ -51,10 +51,10 @@
 <a-entity camera cursor="fuse: false; rayOrigin: mouse;"></a-entity>
 </a-scene>
 <script>
-  window.addEventListener("click", ()=>{
+/** window.addEventListener("click", ()=>{
     const video = document.getElementById("searching")
     video.play()
-  })
+  }) */
 </script>
 </body>
 </html>
