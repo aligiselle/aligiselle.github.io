@@ -1,5 +1,6 @@
-const launch = document.getElementById("launch");
+const video = document.getElementById("launch");
 
-launch.onload = function(){
+video.onload = function(){
   video.play();
+  console.log("clicked");
 }

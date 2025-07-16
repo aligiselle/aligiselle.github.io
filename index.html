@@ -14,7 +14,7 @@
 <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; patternRatio:0.80;' xr-mode-ui="enabled: false">
 
 <a-assets>
-    <video id="launch" autoplay loop controls src="assets/VID-20250716-WA0014.mp4"></video>
+    <video id="launch" autoplay loop src="assets/VID-20250716-WA0014.mp4"></video>
 </a-assets>
     
 <a-marker type="pattern" preset="custom" url="assets/titl-pattern-frame.patt" emitevents="true">
@@ -31,5 +31,6 @@
 <!-- use this <a-entity camera> to support multiple-markers, otherwise use <a-marker-camera> instead of </a-marker> -->
 <a-entity camera cursor="fuse: false; rayOrigin: mouse;"></a-entity>
 </a-scene>
+<script src="app.js"></script>
 </body>
 </html>
