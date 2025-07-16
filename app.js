@@ -1,6 +1,6 @@
 const video = document.getElementById("launch");
 
-video.onload = function(){
+window.addEventListener("click", function(){
   video.play();
   console.log("clicked");
-}
+});
