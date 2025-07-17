@@ -15,6 +15,7 @@
 
 <a-assets>
     <video id="launch" autoplay loop src="assets/VID-20250716-WA0014.mp4"></video>
+    <a-asset-item id="animated-asset" src="/assets/TiTL.glb"></a-asset-item>
 </a-assets>
     
 <a-marker type="pattern" preset="custom" url="assets/titl-pattern-frame.patt" emitevents="true">
@@ -26,6 +27,13 @@
          rotation="-90 0 0"
     >
     </a-video>
+
+     <a-entity
+                gltf-model="#animated-asset"
+                scale="1"
+                position="0.5 0.25 -0.25"
+                rotation="-90 0 0">
+     </a-entity>
   
 </a-marker>
 
