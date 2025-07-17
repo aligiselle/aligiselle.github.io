@@ -11,3 +11,11 @@ window.addEventListener("click", function(){
   } 
 });
 
+window.addEventListener("touchstart", function(){
+   /** video.play();*/
+  if (!video.paused){
+    video.pause();
+  } else {
+    video.play();
+  } 
+});
