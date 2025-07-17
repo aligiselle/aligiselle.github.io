@@ -15,6 +15,7 @@
 <a-assets>
     <video id="launch" autoplay loop src="assets/vid1.mp4"></video>
     <img id="arrow">
+    <img id="texture" src="assets/titl-logo-website.png">
 </a-assets>
     
 <a-marker type="pattern" preset="custom" url="assets/titl-pattern-frame.patt" emitevents="true">
@@ -42,6 +43,16 @@
          rotation="-90 0 0"
     >
     </a-video>
+    <!-- Basic box. -->
+
+    <!-- Textured box. -->
+    <a-box 
+      src="#texture"
+      position = "-1.35 0 0"
+      width="1"
+      height="1"
+      >
+    </a-box>
   
 </a-marker>
 
