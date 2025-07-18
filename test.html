@@ -6,6 +6,7 @@
     <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    
 </head>
 
 <body style='margin : 0px; overflow: hidden;'>
@@ -18,29 +19,28 @@
     <img id="texture" src="assets/titl-logo-website.png">
 </a-assets>
     
-<a-marker type="pattern" preset="custom" url="assets/titl-pattern-frame.patt" emitevents="true"> 
     <a-image
         src="#arrow"
-        width="0.75"
-        height="0.75"
-        position="0.95 0 0"
-        rotation="-90 0 0"
+        width="0.07"
+        height="0.07"
+        position="0 -0.015 -1"
+        rotation="0 0 0"
         >
     </a-image>
     <a-image
         id="tap"
-        width="1"
-        height="1"
-        position="0.95 0 -1"
-        rotation="-90 0 0"
+        width=".1"
+        height=".1"
+        position="0 0.06 -1"
+        rotation="0 0 0"
         src="/assets/TAP.png">
     </a-image>
     <a-video
          src="#launch"
-         width="0.9"
-         height="1.6"
-         position="0 0 0"
-         rotation="-90 0 0"
+         width="0.09"
+         height="0.16"
+         position="-0.1 0 -1"
+         rotation="0 0 0"
     >
     </a-video>
     <!-- Basic box. -->
@@ -48,19 +48,20 @@
     <!-- Textured box. -->
      <a-box 
       src="#texture"
-      position = "-0.85 0 -1"
-      width="0.50"
-      height="0.50"
-      depth="0.50"
+      position = "-0.185 0.075 -1"
+      width="0.05"
+      height="0.05"
+      depth="0.05"
       animation="property: rotation; to: -360 0 0; loop: true; dur: 15000; easing: linear;"
-      animation__2="property: position; to: -0.85 0 0; loop: true; dur: 10000; dir: alternate; easing: linear;"
+      animation__2="property: position; to: -0.185 -0.075 -1; loop: true; dur: 10000; dir: alternate; easing: linear;"
       >
     </a-box>
- 
+    <a-entity><a-image src="#arrow" position="0 0 0"></a-image></a-entity>
+ <a-marker type="pattern" preset="custom" url="assets/titl-pattern-frame.patt" emitevents="true"> 
 </a-marker>
 
 <!-- use this <a-entity camera> to support multiple-markers, otherwise use <a-marker-camera> instead of </a-marker> -->
-<a-entity camera cursor="fuse: false; rayOrigin: mouse;"></a-entity>
+<a-entity camera cursor="fuse: false; rayOrigin: mouse;" position="0 0 0"></a-entity>
 </a-scene> 
 <script src="app.js"></script>
 </body>
