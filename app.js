@@ -53,7 +53,7 @@ import { createCleanMode } from './cleanmode.js';
 /** Path to your model. A .glb (single file) is far more reliable than a .gltf,
  *  which loads its .bin and every texture as separate requests — one wrong
  *  relative path and the model silently fails to appear. */
-const MODEL_URL = './assets/ILOVETOBAGO.glb';
+const MODEL_URL = 'assets/ILOVETOBAGO.glb';
 
 /** How tall the model is in the real world, in metres, at 100% size.
  *  glTF units are metres, so a model authored at 100 units would otherwise be
