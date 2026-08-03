@@ -1,0 +1,131 @@
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0f10; }
+body { font: 400 15px/1.45 "Trebuchet MS", "Segoe UI", system-ui, sans-serif; color: #f2f5f4; }
+canvas { display: block; }
+
+#intro {
+  position: fixed; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 22px; padding: 32px;
+  background: radial-gradient(120% 90% at 50% 0%, #17322f 0%, #0b0f10 70%); text-align: center;
+  /* Once the photo gallery is added this content can exceed the screen, and
+     body has overflow:hidden — without this the Start AR button becomes
+     unreachable. */
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+#intro > * { flex-shrink: 0; }
+#intro h1 { margin: 0; font-size: clamp(30px, 9vw, 46px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
+#intro p { margin: 0; max-width: 32ch; color: #9fb3af; }
+#ar-button-slot :is(button, a) {
+  appearance: none; border: 1px solid #35c1a1; background: #35c1a1; color: #06201b;
+  font: inherit; font-weight: 700; padding: 14px 28px; border-radius: 999px;
+  cursor: pointer; position: static !important; width: auto !important;
+}
+#unsupported { color: #ffb4a2; }
+#gallery .hint { color: #9fb3af; font-size: 14px; margin: 0 0 10px; }
+#shots { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; max-height: 34vh; overflow-y: auto; }
+#shots a { display: block; line-height: 0; }
+#shots img {
+  width: 96px; height: 96px; object-fit: cover; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
+#overlay { position: fixed; inset: 0; pointer-events: none; }
+
+/* The overlay root is the element handed to WebXR as the dom-overlay target.
+   Chrome checks it is rendered when a session starts, so it must never be
+   display:none — hide its children instead. */
+#overlay.hidden > * { display: none; }
+#gesture { position: absolute; inset: 0; pointer-events: auto; touch-action: none; }
+#gesture.off { pointer-events: none; }
+
+#status {
+  position: absolute; top: max(16px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+  background: rgba(6,14,13,0.72); border: 1px solid rgba(255,255,255,0.12);
+  padding: 8px 16px; border-radius: 999px; font-size: 14px; white-space: nowrap; backdrop-filter: blur(6px);
+}
+#panel {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  bottom: max(20px, env(safe-area-inset-bottom)); pointer-events: auto;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+#readout {
+  font-variant-numeric: tabular-nums; font-size: 13px; color: #cfe0dc;
+  background: rgba(6,14,13,0.72); border: 1px solid rgba(255,255,255,0.12);
+  padding: 6px 14px; border-radius: 999px; backdrop-filter: blur(6px);
+}
+.row { display: flex; gap: 8px; }
+.row[hidden] { display: none; }
+button.chip {
+  appearance: none; font: inherit; font-weight: 600; font-size: 14px; color: #f2f5f4;
+  background: rgba(6,14,13,0.72); border: 1px solid rgba(255,255,255,0.18);
+  padding: 11px 16px; border-radius: 999px; backdrop-filter: blur(6px); min-width: 48px;
+}
+button.chip:disabled { opacity: 0.35; }
+button.chip.primary { background: rgba(53,193,161,0.92); border-color: #35c1a1; color: #06201b; }
+
+/* Countdown for posing shots */
+#countdown {
+  position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+  font-size: 22vh; font-weight: 700; color: rgba(255,255,255,0.92);
+  text-shadow: 0 4px 30px rgba(0,0,0,0.6); pointer-events: none;
+}
+#countdown.on { display: flex; }
+#flash {
+  position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none;
+  transition: opacity 220ms ease-out;
+}
+#flash.on { opacity: 0.85; transition: none; }
+
+#errors {
+  position: fixed; z-index: 10; top: max(60px, calc(env(safe-area-inset-top) + 44px));
+  left: 16px; right: 16px; pointer-events: none;
+  background: rgba(120, 26, 16, 0.92); border: 1px solid rgba(255,180,162,0.5);
+  color: #ffe3dc; font-size: 13px; line-height: 1.35; padding: 10px 14px; border-radius: 12px;
+}
+#errors[hidden] { display: none; }
+
+/* Photo review */
+#review {
+  position: absolute; inset: 0; display: none; flex-direction: column; align-items: center;
+  justify-content: center; gap: 16px; padding: 24px; pointer-events: auto;
+  background: rgba(4, 10, 9, 0.92);
+}
+#review.on { display: flex; }
+#review img { max-width: 100%; max-height: 68vh; border-radius: 14px; border: 1px solid rgba(255,255,255,0.14); }
+
+/* --- video: in-app recording ------------------------------------------- */
+button.chip.recording {
+  background: rgba(190, 44, 32, 0.92);
+  border-color: #ff7a68;
+  color: #fff;
+}
+
+/* --- video: clean mode --------------------------------------------------
+   Hide every part of the UI except the transparent gesture layer, which stays
+   alive to catch the tap that brings everything back. The overlay root itself
+   must keep rendering — WebXR is using it as the dom-overlay target. */
+#overlay.clean > *:not(#gesture) { display: none; }
+#overlay.clean #gesture { pointer-events: auto; }
+
+#cleanhint {
+  position: fixed; z-index: 11; left: 50%; transform: translateX(-50%);
+  bottom: max(28px, env(safe-area-inset-bottom));
+  background: rgba(6, 14, 13, 0.8); border: 1px solid rgba(255,255,255,0.14);
+  color: #f2f5f4; font-size: 13px; padding: 9px 16px; border-radius: 999px;
+  backdrop-filter: blur(6px); pointer-events: none;
+  opacity: 0; transition: opacity 600ms ease;
+}
+#cleanhint.on { opacity: 1; }
+
+/* --- gallery: video thumbnails ----------------------------------------- */
+#shots video {
+  width: 96px; height: 96px; object-fit: cover; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.18);
+}
+#shots a.is-video { position: relative; }
+#shots a.is-video::after {
+  content: "▶"; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 22px; text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+}

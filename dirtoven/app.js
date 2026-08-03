@@ -53,12 +53,12 @@ import { createCleanMode } from './cleanmode.js';
 /** Path to your model. A .glb (single file) is far more reliable than a .gltf,
  *  which loads its .bin and every texture as separate requests — one wrong
  *  relative path and the model silently fails to appear. */
-const MODEL_URL = './assets/ILOVETOBAGO.glb';
+const MODEL_URL = './assets/dirtOven.glb';
 
 /** How tall the model is in the real world, in metres, at 100% size.
  *  glTF units are metres, so a model authored at 100 units would otherwise be
  *  100 m tall. normalise() rescales it to exactly this height. */
-const MODEL_HEIGHT = 0.35;
+const MODEL_HEIGHT = 1;
 
 /** Limits for pinch-to-size, as multiples of MODEL_HEIGHT. */
 const MIN_SCALE = 0.2;
